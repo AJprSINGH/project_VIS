@@ -51,12 +51,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                   type="password" 
                   id="newPassword" 
                   formControlName="newPassword"
-                  placeholder="Enter new password">
-                @if (submitted && f['newPassword'].errors) {
+                  placeholder="Enter new password"
+                  required>
+                @if (f['newPassword'].invalid && (f['newPassword'].touched || submitted)) {
                   <div class="error-message">
-                    @if (f['newPassword'].errors['required']) {
+                    @if (f['newPassword'].errors?.['required']) {
                       Password is required
-                    } @else if (f['newPassword'].errors['pattern']) {
+                    } @else if (f['newPassword'].errors?.['pattern']) {
                       Password must include at least one special character
                     }
                   </div>
@@ -101,55 +102,45 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       align-items: center;
       margin-bottom: var(--space-6);
     }
-    
     .detail-card {
       display: flex;
       flex-direction: column;
       gap: var(--space-6);
     }
-    
     .detail-section {
       border-bottom: 1px solid var(--neutral-200);
       padding-bottom: var(--space-6);
     }
-    
     .detail-section:last-child {
       border-bottom: none;
       padding-bottom: 0;
     }
-    
     .detail-section h2 {
       margin-bottom: var(--space-4);
       color: var(--primary-700);
     }
-    
     .detail-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: var(--space-4);
     }
-    
     .detail-item {
       display: flex;
       flex-direction: column;
     }
-    
     .detail-label {
       font-size: 0.875rem;
       color: var(--neutral-600);
       margin-bottom: var(--space-1);
     }
-    
     .detail-value {
       font-weight: 500;
     }
-    
     .form-actions {
       display: flex;
       justify-content: flex-end;
       margin-top: var(--space-4);
     }
-    
     .spinner-inline {
       width: 16px;
       height: 16px;
@@ -160,11 +151,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       display: inline-block;
       margin-right: var(--space-2);
     }
-    
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
-    
     @media (max-width: 768px) {
       .header-actions {
         flex-direction: column;
@@ -180,7 +169,7 @@ export class UnderwriterDetailComponent implements OnInit {
   submitted = false;
   error = '';
   successMessage = '';
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -189,10 +178,13 @@ export class UnderwriterDetailComponent implements OnInit {
     private authService: AuthService
   ) {
     this.passwordForm = this.formBuilder.group({
-      newPassword: ['', [Validators.required, Validators.pattern(/.*[!@#$%^&*(),.?":{}|<>].*/)]],
+      newPassword: ['', [
+        Validators.required,
+        Validators.pattern(/.*[!@#$%^&*(),.?":{}|<>].*/),
+      ]],
     });
   }
-  
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -201,9 +193,9 @@ export class UnderwriterDetailComponent implements OnInit {
       this.router.navigate(['/admin/underwriters']);
     }
   }
-  
+
   get f() { return this.passwordForm.controls; }
-  
+
   loadUnderwriter(id: string): void {
     this.underwriterService.getUnderwriterById(id).subscribe({
       next: (data) => {
@@ -214,23 +206,24 @@ export class UnderwriterDetailComponent implements OnInit {
       }
     });
   }
-  
+
   updatePassword(): void {
     this.submitted = true;
     this.error = '';
     this.successMessage = '';
-    
+
+    // Mark all controls as touched to show validation errors
+    Object.values(this.passwordForm.controls).forEach(control => control.markAsTouched());
+
     if (this.passwordForm.invalid || !this.underwriter) {
       return;
     }
-    
+
     const newPassword = this.f['newPassword'].value;
-    
-    // Update in auth service for demo
+
     const success = this.authService.updateUnderwriterPassword(this.underwriter.id, newPassword);
-    
+
     if (success) {
-      // Update in underwriter service
       this.underwriterService.updateUnderwriter(this.underwriter.id, {
         password: newPassword
       }).subscribe({

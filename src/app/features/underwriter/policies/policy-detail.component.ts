@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InsuranceService } from '../../../core/services/insurance.service';
 import { VehicleInsurance } from '../../../core/models/user.model';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -8,7 +9,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 @Component({
   selector: 'app-policy-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LoadingSpinnerComponent],
   template: `
     <div class="container">
       <div class="header-actions">
@@ -88,6 +89,41 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 <span class="detail-value">{{ policy.toDate | date:'mediumDate' }}</span>
               </div>
             </div>
+          </div>
+          
+          <div class="detail-section">
+            <h3>Update Insurance Type</h3>
+            <form [formGroup]="updateForm" (ngSubmit)="updateInsuranceType()">
+              <div class="form-control">
+                <label for="type">New Insurance Type</label>
+                <select id="type" formControlName="type">
+                  <option value="Full Insurance">Full Insurance</option>
+                  <option value="Third Party">Third Party</option>
+                </select>
+              </div>
+              
+              @if (updateError) {
+                <div class="error-message">{{ updateError }}</div>
+              }
+              
+              @if (updateSuccess) {
+                <div class="success-message">{{ updateSuccess }}</div>
+              }
+              
+              <div class="form-actions">
+                <button 
+                  type="submit" 
+                  class="btn btn-primary" 
+                  [disabled]="updateForm.invalid || insuranceService.isLoading()">
+                  @if (insuranceService.isLoading()) {
+                    <span class="spinner-inline"></span>
+                    Updating...
+                  } @else {
+                    Update Insurance Type
+                  }
+                </button>
+              </div>
+            </form>
           </div>
           
           <div class="detail-actions">
@@ -197,6 +233,27 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
       border-top: 1px solid var(--neutral-200);
     }
     
+    .form-actions {
+      margin-top: var(--space-4);
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    .spinner-inline {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      animation: spin 1s infinite linear;
+      display: inline-block;
+      margin-right: var(--space-2);
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
     @media (max-width: 768px) {
       .header-actions {
         flex-direction: column;
@@ -212,14 +269,22 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   `]
 })
 export class PolicyDetailComponent implements OnInit {
-  policy: VehicleInsurance | null | undefined = null;
-  
+  policy: VehicleInsurance | null = null;
+  updateForm: FormGroup;
+  updateError = '';
+  updateSuccess = '';
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
+    private formBuilder: FormBuilder,
     public insuranceService: InsuranceService
-  ) {}
-  
+  ) {
+    this.updateForm = this.formBuilder.group({
+      type: ['', Validators.required]
+    });
+  }
+
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -228,18 +293,51 @@ export class PolicyDetailComponent implements OnInit {
       this.router.navigate(['/underwriter/policies']);
     }
   }
-  
+
   loadPolicy(id: string): void {
     this.insuranceService.getPolicyById(id).subscribe({
       next: (data) => {
-        this.policy = data;
+        if (data) {
+          this.policy = data;
+          this.updateForm.patchValue({ type: data.type });
+        } else {
+          this.policy = null;
+        }
       },
       error: () => {
         this.router.navigate(['/underwriter/policies']);
       }
     });
   }
-  
+
+  updateInsuranceType(): void {
+    if (!this.policy || this.updateForm.invalid) {
+      return;
+    }
+
+    const newType = this.updateForm.get('type')?.value;
+
+    if (newType === this.policy.type) {
+      this.updateError = 'Please select a different insurance type';
+      return;
+    }
+
+    this.updateError = '';
+    this.updateSuccess = '';
+
+    this.insuranceService.updatePolicy(this.policy.id!, {
+      type: newType
+    }).subscribe({
+      next: (updatedPolicy) => {
+        this.policy = updatedPolicy;
+        this.updateSuccess = 'Insurance type updated successfully';
+      },
+      error: (err) => {
+        this.updateError = err.message || 'Failed to update insurance type';
+      }
+    });
+  }
+
   printPolicy(): void {
     window.print();
   }
