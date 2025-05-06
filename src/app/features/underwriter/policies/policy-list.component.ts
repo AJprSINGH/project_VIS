@@ -11,54 +11,57 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
   template: `
     <div class="container">
-      <div class="header-actions">
-        <h1>Insurance Policies</h1>
-        <a routerLink="/underwriter/policies/new" class="btn btn-primary">Create New Policy</a>
-      </div>
-      
-      @if (policies.length === 0 && !insuranceService.isLoading()) {
-        <div class="empty-state card">
-          <h3>No Policies Found</h3>
-          <p>You haven't created any insurance policies yet.</p>
-          <a routerLink="/underwriter/policies/new" class="btn btn-primary">Create First Policy</a>
-        </div>
-      } @else {
-        <div class="card">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Policy ID</th>
-                <th>Customer Name</th>
-                <th>Vehicle No</th>
-                <th>Type</th>
-                <th>Premium Amount</th>
-                <th>Valid Until</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (policy of policies; track policy.id) {
-                <tr>
-                  <td>{{ policy.id }}</td>
-                  <td>{{ policy.customerName }}</td>
-                  <td>{{ policy.vehicleNo }}</td>
-                  <td>{{ policy.type }}</td>
-                  <td>₹{{ policy.premiumAmount }}</td>
-                  <td>{{ policy.toDate | date:'mediumDate' }}</td>
-                  <td class="actions">
-                    <a [routerLink]="['/underwriter/policies', policy.id]" class="btn-link">View</a>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-      
-      @if (insuranceService.isLoading()) {
-        <app-loading-spinner message="Loading policies..."></app-loading-spinner>
-      }
+  <div class="header-actions">
+    <h1>Insurance Policies</h1>
+    <a routerLink="/underwriter/policies/new" class="btn btn-primary">Create New Policy</a>
+  </div>
+
+  <ng-container *ngIf="policies.length === 0 && !insuranceService.isLoading()">
+    <div class="empty-state card">
+      <h3>No Policies Found</h3>
+      <p>You haven't created any insurance policies yet.</p>
+      <a routerLink="/underwriter/policies/new" class="btn btn-primary">Create First Policy</a>
     </div>
+  </ng-container>
+
+  <ng-container *ngIf="policies.length > 0">
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Policy ID</th>
+            <th>Customer Name</th>
+            <th>Vehicle No</th>
+            <th>Type</th>
+            <th>Premium Amount</th>
+            <th>Valid Until</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (policy of policies; track policy.id) {
+            <tr>
+              <td>{{ policy.id }}</td>
+              <td>{{ policy.customerName }}</td>
+              <td>{{ policy.vehicleNo }}</td>
+              <td>{{ policy.type }}</td>
+              <td>₹{{ policy.premiumAmount }}</td>
+              <td>{{ policy.toDate | date: 'mediumDate' }}</td>
+              <td class="actions">
+                <a [routerLink]="['/underwriter/policies', policy.id]" class="btn-link">View</a>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="insuranceService.isLoading()">
+    <app-loading-spinner message="Loading policies..."></app-loading-spinner>
+  </ng-container>
+</div>
+
   `,
   styles: [`
     .header-actions {
@@ -135,13 +138,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 })
 export class PolicyListComponent implements OnInit {
   policies: VehicleInsurance[] = [];
-  
-  constructor(public insuranceService: InsuranceService) {}
-  
+
+  constructor(public insuranceService: InsuranceService) { }
+
   ngOnInit(): void {
     this.loadPolicies();
   }
-  
+
   loadPolicies(): void {
     this.insuranceService.getAllPolicies().subscribe(data => {
       this.policies = data;

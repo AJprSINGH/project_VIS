@@ -17,13 +17,18 @@ import { AuthService } from '../../services/auth.service';
         </div>
         <nav class="nav">
           <ul>
-            @if (authService.isAdmin()) {
+            <ng-container *ngIf="authService.isAdmin(); else underwriterLinks">
               <li><a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a></li>
               <li><a routerLink="/admin/underwriters" routerLinkActive="active">Underwriters</a></li>
-            } @else if (authService.isUnderwriter()) {
-              <li><a routerLink="/underwriter/dashboard" routerLinkActive="active">Dashboard</a></li>
-              <li><a routerLink="/underwriter/policies" routerLinkActive="active">Policies</a></li>
-            }
+            </ng-container>
+
+            <ng-template #underwriterLinks>
+              <ng-container *ngIf="authService.isUnderwriter()">
+                <li><a routerLink="/underwriter/dashboard" routerLinkActive="active">Dashboard</a></li>
+                <li><a routerLink="/underwriter/policies" routerLinkActive="active">Policies</a></li>
+              </ng-container>
+            </ng-template>
+
             <li>
               <button class="btn btn-outline" (click)="logout()">Logout</button>
             </li>
@@ -89,8 +94,8 @@ import { AuthService } from '../../services/auth.service';
   `]
 })
 export class HeaderComponent {
-  constructor(public authService: AuthService) {}
-  
+  constructor(public authService: AuthService) { }
+
   logout(): void {
     this.authService.logout();
   }

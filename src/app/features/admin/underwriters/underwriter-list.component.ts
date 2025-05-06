@@ -16,13 +16,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
         <a routerLink="/admin/underwriters/new" class="btn btn-primary">Register New Underwriter</a>
       </div>
       
-      @if (underwriters.length === 0 && !underwriterService.isLoading()) {
+      <ng-container *ngIf="underwriters.length === 0 && !underwriterService.isLoading()">
         <div class="empty-state card">
           <h3>No Underwriters Found</h3>
           <p>There are no underwriters registered in the system yet.</p>
           <a routerLink="/admin/underwriters/new" class="btn btn-primary">Register First Underwriter</a>
         </div>
-      } @else {
+      </ng-container><ng-container *ngIf="true">
         <div class="card">
           <table class="data-table">
             <thead>
@@ -50,11 +50,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
             </tbody>
           </table>
         </div>
-      }
+      </ng-container>
       
-      @if (underwriterService.isLoading()) {
+      <ng-container *ngIf="underwriterService.isLoading()">
         <app-loading-spinner message="Loading underwriters..."></app-loading-spinner>
-      }
+      </ng-container>
     </div>
   `,
   styles: [`
@@ -145,13 +145,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 })
 export class UnderwriterListComponent implements OnInit {
   underwriters: Underwriter[] = [];
-  
-  constructor(public underwriterService: UnderwriterService) {}
-  
+
+  constructor(public underwriterService: UnderwriterService) { }
+
   ngOnInit(): void {
     this.loadUnderwriters();
   }
-  
+
   loadUnderwriters(): void {
     this.underwriterService.getAllUnderwriters().subscribe(data => {
       this.underwriters = data;
@@ -165,7 +165,7 @@ export class UnderwriterListComponent implements OnInit {
         this.loadUnderwriters();
       });
     } else {
-        return;
+      return;
     }
 
   }

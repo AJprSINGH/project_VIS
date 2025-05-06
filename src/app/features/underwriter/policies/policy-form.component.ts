@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router'; 
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'; 
+import { RouterModule, Router } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InsuranceService } from '../../../core/services/insurance.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -12,179 +12,187 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   imports: [CommonModule, RouterModule, ReactiveFormsModule, LoadingSpinnerComponent],
   template: `
     <div class="container">
-      <div class="header-actions">
-        <h1>Create New Vehicle Insurance</h1>
-        <a routerLink="/underwriter/policies" class="btn btn-outline1">Back to List</a>
+  <div class="header-actions">
+    <h1>Create New Vehicle Insurance</h1>
+    <a routerLink="/underwriter/policies" class="btn btn-outline1">Back to List</a>
+  </div>
+
+  <div class="card">
+    <form [formGroup]="policyForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <div class="form-control">
+          <label for="vehicleNo">Vehicle No (Max 10 characters)</label>
+          <input 
+            type="text" 
+            id="vehicleNo" 
+            formControlName="vehicleNo"
+            placeholder="e.g., MH02AB1234">
+          <ng-container *ngIf="submitted && f['vehicleNo'].errors">
+            <div class="error-message">
+              <ng-container *ngIf="f['vehicleNo'].errors['required']">
+                Vehicle number is required
+              </ng-container>
+              <ng-container *ngIf="f['vehicleNo'].errors['maxlength']">
+                Vehicle number cannot exceed 10 characters
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="vehicleType">Vehicle Type</label>
+          <select id="vehicleType" formControlName="vehicleType">
+            <option value="">Select vehicle type</option>
+            <option value="two-wheeler">2-wheeler</option>
+            <option value="four-wheeler">4-wheeler</option>
+          </select>
+          <ng-container *ngIf="submitted && f['vehicleType'].errors">
+            <div class="error-message">Vehicle type is required</div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="customerName">Customer Name</label>
+          <input 
+            type="text" 
+            id="customerName" 
+            formControlName="customerName"
+            placeholder="Enter customer name">
+          <ng-container *ngIf="submitted && f['customerName'].errors">
+            <div class="error-message">
+              <ng-container *ngIf="f['customerName'].errors['required']">
+                Customer name is required
+              </ng-container>
+              <ng-container *ngIf="f['customerName'].errors['maxlength']">
+                Customer name cannot exceed 50 characters
+              </ng-container>
+              <ng-container *ngIf="true">
+                Name should only contain letters 
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="engineNo">Engine No</label>
+          <input 
+            type="text" 
+            id="engineNo" 
+            formControlName="engineNo"
+            placeholder="Enter engine number">
+          <ng-container *ngIf="submitted && f['engineNo'].errors">
+            <div class="error-message">Engine number is required</div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="chassisNo">Chassis No</label>
+          <input 
+            type="text" 
+            id="chassisNo" 
+            formControlName="chassisNo"
+            placeholder="Enter chassis number">
+          <ng-container *ngIf="submitted && f['chassisNo'].errors">
+            <div class="error-message">Chassis number is required</div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="phoneNo">Phone No (10 digits)</label>
+          <input 
+            type="text" 
+            id="phoneNo" 
+            formControlName="phoneNo"
+            placeholder="Enter 10 digit phone number">
+          <ng-container *ngIf="submitted && f['phoneNo'].errors">
+            <div class="error-message">
+              <ng-container *ngIf="f['phoneNo'].errors['required']">
+                Phone number is required
+              </ng-container>
+              <ng-container *ngIf="true">
+                Phone number must be 10 digits and do not start with zero!!
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="premiumAmount">Premium Amount</label>
+          <input 
+            type="number" 
+            id="premiumAmount" 
+            formControlName="premiumAmount"
+            placeholder="N/A">
+          <ng-container *ngIf="submitted && f['premiumAmount'].errors">
+            <div class="error-message">
+              <ng-container *ngIf="f['premiumAmount'].errors['required']">
+                Premium amount is required
+              </ng-container>
+              <ng-container *ngIf="f['premiumAmount'].errors['min']">
+                Premium amount must be greater than 0
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="type">Insurance Type</label>
+          <select id="type" formControlName="type">
+            <option value="">Select insurance type</option>
+            <option value="Full Insurance">Full Insurance</option>
+            <option value="Third Party">Third Party</option>
+          </select>
+          <ng-container *ngIf="submitted && f['type'].errors">
+            <div class="error-message">Insurance type is required</div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="fromDate">From Date</label>
+          <input 
+            type="date" 
+            id="fromDate" 
+            formControlName="fromDate">
+          <ng-container *ngIf="submitted && f['fromDate'].errors">
+            <div class="error-message">From date is required</div>
+          </ng-container>
+        </div>
+
+        <div class="form-control">
+          <label for="toDate">To Date</label>
+          <input 
+            type="date" 
+            id="toDate" 
+            formControlName="toDate">
+          <ng-container *ngIf="submitted && f['toDate'].errors">
+            <div class="error-message">To date is required</div>
+          </ng-container>
+        </div>
       </div>
-      
-      <div class="card">
-        <form [formGroup]="policyForm" (ngSubmit)="onSubmit()">
-          <div class="form-grid">
-            <div class="form-control">
-              <label for="vehicleNo">Vehicle No (Max 10 characters)</label>
-              <input 
-                type="text" 
-                id="vehicleNo" 
-                formControlName="vehicleNo"
-                placeholder="e.g., MH02AB1234">
-              @if (submitted && f['vehicleNo'].errors) {
-                <div class="error-message">
-                  @if (f['vehicleNo'].errors['required']) {
-                    Vehicle number is required
-                  } @else if (f['vehicleNo'].errors['maxlength']) {
-                    Vehicle number cannot exceed 10 characters
-                  }
-                </div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="vehicleType">Vehicle Type</label>
-              <select id="vehicleType" formControlName="vehicleType">
-                <option value="">Select vehicle type</option>
-                <option value="two-wheeler">2-wheeler</option>
-                <option value="four-wheeler">4-wheeler</option>
-              </select>
-              @if (submitted && f['vehicleType'].errors) {
-                <div class="error-message">Vehicle type is required</div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="customerName">Customer Name</label>
-              <input 
-                type="text" 
-                id="customerName" 
-                formControlName="customerName"
-                placeholder="Enter customer name">
-              @if (submitted && f['customerName'].errors) {
-                <div class="error-message">
-                  @if (f['customerName'].errors['required']) {
-                    Customer name is required
-                  } @else if (f['customerName'].errors['maxlength']) {
-                    Customer name cannot exceed 50 characters
-                  } @else{
-                    Name should only contain letters 
-                  }
-                </div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="engineNo">Engine No</label>
-              <input 
-                type="text" 
-                id="engineNo" 
-                formControlName="engineNo"
-                placeholder="Enter engine number">
-              @if (submitted && f['engineNo'].errors) {
-                <div class="error-message">Engine number is required</div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="chassisNo">Chassis No</label>
-              <input 
-                type="text" 
-                id="chassisNo" 
-                formControlName="chassisNo"
-                placeholder="Enter chassis number">
-              @if (submitted && f['chassisNo'].errors) {
-                <div class="error-message">Chassis number is required</div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="phoneNo">Phone No (10 digits)</label>
-              <input 
-                type="text" 
-                id="phoneNo" 
-                formControlName="phoneNo"
-                placeholder="Enter 10 digit phone number">
-              @if (submitted && f['phoneNo'].errors) {
-                <div class="error-message">
-                  @if (f['phoneNo'].errors['required']) {
-                    Phone number is required
-                  } @else {
-                    Phone number must be 10 digits and do not start wit zero!!
-                  }
-                </div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="premiumAmount">Premium Amount</label>
-              <input 
-                type="number" 
-                id="premiumAmount" 
-                formControlName="premiumAmount"
-                placeholder="N/A">
-              @if (submitted && f['premiumAmount'].errors) {
-                <div class="error-message">
-                  @if (f['premiumAmount'].errors['required']) {
-                    Premium amount is required
-                  } @else if (f['premiumAmount'].errors['min']) {
-                    Premium amount must be greater than 0
-                  }
-                </div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="type">Insurance Type</label>
-              <select id="type" formControlName="type">
-                <option value="">Select insurance type</option>
-                <option value="Full Insurance">Full Insurance</option>
-                <option value="Third Party">Third Party</option>
-              </select>
-              @if (submitted && f['type'].errors) {
-                <div class="error-message">Insurance type is required</div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="fromDate">From Date</label>
-              <input 
-                type="date" 
-                id="fromDate" 
-                formControlName="fromDate">
-              @if (submitted && f['fromDate'].errors) {
-                <div class="error-message">From date is required</div>
-              }
-            </div>
-            
-            <div class="form-control">
-              <label for="toDate">To Date</label>
-              <input 
-                type="date" 
-                id="toDate" 
-                formControlName="toDate">
-              @if (submitted && f['toDate'].errors) {
-                <div class="error-message">To date is required</div>
-              }
-            </div>
-          </div>
-          @if (error) {
-            <div class="error-message">{{ error }}</div>
-          }
-          
-          <div class="form-actions">
-            <button type="button" class="btn btn-outline" routerLink="/underwriter/policies">Cancel</button>
-            <button 
-              type="submit" 
-              class="btn btn-primary" 
-              [disabled]="insuranceService.isLoading()">
-              @if (insuranceService.isLoading()) {
-                <span class="spinner-inline"></span>
-                Creating...
-              } @else {
-                Create Policy
-              }
-            </button>
-          </div>
-        </form>
+
+      <ng-container *ngIf="error">
+        <div class="error-message">{{ error }}</div>
+      </ng-container>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" routerLink="/underwriter/policies">Cancel</button>
+        <button 
+          type="submit" 
+          class="btn btn-primary" 
+          [disabled]="insuranceService.isLoading()">
+          <ng-container *ngIf="insuranceService.isLoading(); else notLoading">
+            <span class="spinner-inline"></span>
+            Creating...
+          </ng-container>
+          <ng-template #notLoading>
+            Create Policy
+          </ng-template>
+        </button>
       </div>
-    </div>
+    </form>
+  </div>
+</div>
+
   `,
   styles: [`
     .header-actions {
@@ -239,13 +247,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     }
   `]
 })
-export class PolicyFormComponent implements OnInit{
-  
-  
+export class PolicyFormComponent implements OnInit {
+
+
   policyForm: FormGroup;
   submitted = false;
   error = '';
-  
+
   constructor(
     private formBuilder: FormBuilder,
     public insuranceService: InsuranceService,
@@ -265,8 +273,8 @@ export class PolicyFormComponent implements OnInit{
       toDate: ['', Validators.required]
     });
   }
-  
-  
+
+
   private calculateToDate(fromDate: string | null): string | null {
     if (!fromDate) {
       return null;
@@ -279,7 +287,7 @@ export class PolicyFormComponent implements OnInit{
     const day = to.getDate().toString().padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-  
+
   ngOnInit(): void {
     this.policyForm.get('type')?.valueChanges.subscribe(type => {
       if (type === 'Full Insurance') {
@@ -295,31 +303,31 @@ export class PolicyFormComponent implements OnInit{
       const toDate = this.calculateToDate(fromDate);
       this.policyForm.get('toDate')?.setValue(toDate, { emitEvent: false });
     });
-    
-    
+
+
   }
-  
+
   get f() { return this.policyForm.controls; }
-  
+
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
-    
+
     if (this.policyForm.invalid) {
       return;
     }
-    
+
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) {
       this.error = 'Authentication error';
       return;
     }
-    
+
     const policyData = {
       ...this.policyForm.value,
       underwriterId: currentUser.id
     };
-    
+
     this.insuranceService.createPolicy(policyData).subscribe({
       next: () => {
         this.router.navigate(['/underwriter/policies']);

@@ -11,131 +11,133 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   standalone: true,
   imports: [CommonModule, RouterModule, ReactiveFormsModule, LoadingSpinnerComponent],
   template: `
-    <div class="container">
-      <div class="header-actions">
-        <h1>Insurance Policy Details</h1>
-        <a routerLink="/underwriter/policies" class="btn btn-outline1">Back to List</a>
+          <div class="container">
+  <div class="header-actions">
+    <h1>Insurance Policy Details</h1>
+    <a routerLink="/underwriter/policies" class="btn btn-outline1">Back to List</a>
+  </div>
+
+  <ng-container *ngIf="policy">
+    <div class="card detail-card">
+      <div class="detail-header">
+        <div>
+          <h2>{{ policy.customerName }}</h2>
+          <p class="subtitle">
+            Policy ID: <strong>{{ policy.id }}</strong>
+            <span class="dot-separator"></span>
+            Created: <strong>{{ policy.createdAt | date:'mediumDate' }}</strong>
+          </p>
+        </div>
+        <div class="policy-status">
+          <span class="badge badge-success">Active</span>
+        </div>
       </div>
-      
-      @if (policy) {
-        <div class="card detail-card">
-          <div class="detail-header">
-            <div>
-              <h2>{{ policy.customerName }}</h2>
-              <p class="subtitle">
-                Policy ID: <strong>{{ policy.id }}</strong>
-                <span class="dot-separator"></span>
-                Created: <strong>{{ policy.createdAt | date:'mediumDate' }}</strong>
-              </p>
-            </div>
-            <div class="policy-status">
-              <span class="badge badge-success">Active</span>
-            </div>
+
+      <div class="detail-section">
+        <h3>Customer Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Name</span>
+            <span class="detail-value">{{ policy.customerName }}</span>
           </div>
-          
-          <div class="detail-section">
-            <h3>Customer Information</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <span class="detail-label">Name</span>
-                <span class="detail-value">{{ policy.customerName }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Phone Number</span>
-                <span class="detail-value">{{ policy.phoneNo }}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="detail-section">
-            <h3>Vehicle Information</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <span class="detail-label">Vehicle Number</span>
-                <span class="detail-value">{{ policy.vehicleNo }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Vehicle Type</span>
-                <span class="detail-value">{{ policy.vehicleType === 'two-wheeler' ? '2-wheeler' : '4-wheeler' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Engine Number</span>
-                <span class="detail-value">{{ policy.engineNo }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Chassis Number</span>
-                <span class="detail-value">{{ policy.chassisNo }}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="detail-section">
-            <h3>Policy Information</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <span class="detail-label">Insurance Type</span>
-                <span class="detail-value">{{ policy.type }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Premium Amount</span>
-                <span class="detail-value">₹{{ policy.premiumAmount }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Policy Start Date</span>
-                <span class="detail-value">{{ policy.fromDate | date:'mediumDate' }}</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Policy End Date</span>
-                <span class="detail-value">{{ policy.toDate | date:'mediumDate' }}</span>
-              </div>
-            </div>
-          </div>
-          
-          <div class="detail-section">
-            <h3>Update Insurance Type</h3>
-            <form [formGroup]="updateForm" (ngSubmit)="updateInsuranceType()">
-              <div class="form-control">
-                <label for="type">New Insurance Type</label>
-                <select id="type" formControlName="type">
-                  <option value="Full Insurance">Full Insurance</option>
-                  <option value="Third Party">Third Party</option>
-                </select>
-              </div>
-              
-              @if (updateError) {
-                <div class="error-message">{{ updateError }}</div>
-              }
-              
-              @if (updateSuccess) {
-                <div class="success-message">{{ updateSuccess }}</div>
-              }
-              
-              <div class="form-actions">
-                <button 
-                  type="submit" 
-                  class="btn btn-primary" 
-                  [disabled]="updateForm.invalid || insuranceService.isLoading()">
-                  @if (insuranceService.isLoading()) {
-                    <span class="spinner-inline"></span>
-                    Updating...
-                  } @else {
-                    Update Insurance Type
-                  }
-                </button>
-              </div>
-            </form>
-          </div>
-          
-          <div class="detail-actions">
-            <button class="btn btn-outline" (click)="printPolicy()">Print Policy</button>
+          <div class="detail-item">
+            <span class="detail-label">Phone Number</span>
+            <span class="detail-value">{{ policy.phoneNo }}</span>
           </div>
         </div>
-      }
-      
-      @if (insuranceService.isLoading() && !policy) {
-        <app-loading-spinner message="Loading policy details..."></app-loading-spinner>
-      }
+      </div>
+
+      <div class="detail-section">
+        <h3>Vehicle Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Vehicle Number</span>
+            <span class="detail-value">{{ policy.vehicleNo }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Vehicle Type</span>
+            <span class="detail-value">
+              {{ policy.vehicleType === 'two-wheeler' ? '2-wheeler' : '4-wheeler' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Engine Number</span>
+            <span class="detail-value">{{ policy.engineNo }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Chassis Number</span>
+            <span class="detail-value">{{ policy.chassisNo }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Policy Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Insurance Type</span>
+            <span class="detail-value">{{ policy.type }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Premium Amount</span>
+            <span class="detail-value">₹{{ policy.premiumAmount }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Policy Start Date</span>
+            <span class="detail-value">{{ policy.fromDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Policy End Date</span>
+            <span class="detail-value">{{ policy.toDate | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <h3>Update Insurance Type</h3>
+        <form [formGroup]="updateForm" (ngSubmit)="updateInsuranceType()">
+          <div class="form-control">
+            <label for="type">New Insurance Type</label>
+            <select id="type" formControlName="type">
+              <option value="Full Insurance">Full Insurance</option>
+              <option value="Third Party">Third Party</option>
+            </select>
+          </div>
+
+          <ng-container *ngIf="updateError">
+            <div class="error-message">{{ updateError }}</div>
+          </ng-container>
+
+          <ng-container *ngIf="updateSuccess">
+            <div class="success-message">{{ updateSuccess }}</div>
+          </ng-container>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-primary" 
+              [disabled]="updateForm.invalid || insuranceService.isLoading()">
+              <ng-container *ngIf="insuranceService.isLoading(); else updateLabel">
+                <span class="spinner-inline"></span>
+                Updating...
+              </ng-container>
+              <ng-template #updateLabel>Update Insurance Type</ng-template>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn btn-outline" (click)="printPolicy()">Print Policy</button>
+      </div>
     </div>
+  </ng-container>
+
+  <ng-container *ngIf="insuranceService.isLoading() && !policy">
+    <app-loading-spinner message="Loading policy details..."></app-loading-spinner>
+  </ng-container>
+</div>
+
   `,
   styles: [`
     .header-actions {

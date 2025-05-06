@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router'; 
+import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UnderwriterService } from '../../../core/services/underwriter.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -17,7 +17,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
         <a routerLink="/admin/underwriters" class="btn btn-outline1">Back to List</a>
       </div>
       
-      @if (showSuccessMessage) {
+      <ng-container *ngIf="showSuccessMessage">
         <div class="success-message-container">
         <div class="success-message-popup">
             <div class="success-message">
@@ -25,7 +25,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
             </div>
         </div>
         </div>
-      }
+      </ng-container>
       <div class="card">
         <form [formGroup]="underwriterForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
@@ -36,20 +36,20 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 id="name" 
                 formControlName="name"
                 placeholder="Enter full name">
-              @if (submitted && f['name'].errors) {
+              <ng-container *ngIf="submitted && f['name'].errors">
               
                
               
                 <div class="error-message">
-                  @if (f['name'].errors['required']) {
+                  <ng-container *ngIf="f['name'].errors['required']">
                     Name is required
-                  } @else if (f['name'].errors['maxlength']) {
+                  </ng-container><ng-container *ngIf="f['name'].errors['maxlength']">
                     Name cannot exceed 50 characters
-                  } @else{
+                  </ng-container><ng-container *ngIf="true">
                     Name should only contain letters
-                   }
+                   </ng-container>
                 </div>
-              }
+              </ng-container>
             </div>
             
             <div class="form-control">
@@ -58,17 +58,17 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 type="date" 
                 id="dob" 
                 formControlName="dob" >
-              @if (submitted && f['dob'].errors) {
+              <ng-container *ngIf="submitted && f['dob'].errors">
                 <div class="error-message">
                 
                 
                 
-                @if (f['dob'].errors['required']) {
+                <ng-container *ngIf="f['dob'].errors['required']">
                   Date of birth is required
-                } @else if (f['dob'].errors['underAge']) {
+                </ng-container><ng-container *ngIf="f['dob'].errors['underAge']">
                   User must be 18 years or older
-                }</div>
-              }
+                </ng-container></div>
+              </ng-container>
             </div>
             
             <div class="form-control">
@@ -80,15 +80,15 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
               
               
               
-              @if (submitted && underwriterForm.errors?.['invalidJoiningDate']) {
+              <ng-container *ngIf="submitted && underwriterForm.errors?.['invalidJoiningDate']">
                 <div class="error-message">
                   Joining date should be 18 years after the date of birth
                 </div>
-              }
-              @if (submitted && f['joiningDate'].errors) {
+              </ng-container>
+              <ng-container *ngIf="submitted && f['joiningDate'].errors">
                 <div class="error-message">
                 </div>
-                }
+                </ng-container>
               
             </div>
             
@@ -99,21 +99,21 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 id="password" 
                 formControlName="password"
                 placeholder="Set initial password">
-              @if (submitted && f['password'].errors) {
+              <ng-container *ngIf="submitted && f['password'].errors">
                 <div class="error-message">
-                  @if (f['password'].errors['required']) {
+                  <ng-container *ngIf="f['password'].errors['required']">
                     Password is required
-                  } @else if (f['password'].errors['pattern']) {
+                  </ng-container><ng-container *ngIf="f['password'].errors['pattern']">
                     Password must include at least one special character
-                  }
+                  </ng-container>
                 </div>
-              }
+              </ng-container>
             </div>
           </div>
           
-          @if (error) {
-            <div class="error-message">{{ error }}</div>
-          }
+          <ng-container *ngIf="error">
+            <div class="error-message">{{ error }}></div>
+          </ng-container>
           
           <div class="form-actions">
             <button type="button" class="btn btn-outline" routerLink="/admin/underwriters">Cancel</button>
@@ -121,12 +121,12 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
               type="submit" 
               class="btn btn-primary" 
               [disabled]="underwriterService.isLoading()">
-              @if (underwriterService.isLoading()) {
+              <ng-container *ngIf="underwriterService.isLoading()">
                 <span class="spinner-inline"></span>
                 Registering...
-              } @else {
+              </ng-container><ng-container *ngIf="true">
                 Register Underwriter
-              }
+              </ng-container>
             </button>
           </div>
         </form>
@@ -206,16 +206,16 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   `]
 })
 export class UnderwriterFormComponent implements OnInit {
-  
+
   private underAgeValidator() {
     return (control: any) => {
       if (control.value) {
         const dob = new Date(control.value);
         const today = new Date();
         const age = today.getFullYear() - dob.getFullYear();
-                
-                
-                
+
+
+
         const monthDiff = today.getMonth() - dob.getMonth();
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
           return age - 1 < 18 ? { underAge: true } : null;
@@ -233,16 +233,16 @@ export class UnderwriterFormComponent implements OnInit {
       const joiningDate = group.controls['joiningDate'].value;
 
       if (dob && joiningDate) {
-      
-      
-      
+
+
+
         const dobDate = new Date(dob);
         const joiningDateDate = new Date(joiningDate);
 
         const ageAtJoining = joiningDateDate.getFullYear() - dobDate.getFullYear();
         const monthDiff = joiningDateDate.getMonth() - dobDate.getMonth();
 
-        if (ageAtJoining < 18 || (ageAtJoining === 18 && monthDiff < 0) || (ageAtJoining === 18 && monthDiff === 0 && joiningDateDate.getDate() < dobDate.getDate()) ) {
+        if (ageAtJoining < 18 || (ageAtJoining === 18 && monthDiff < 0) || (ageAtJoining === 18 && monthDiff === 0 && joiningDateDate.getDate() < dobDate.getDate())) {
           return { invalidJoiningDate: true };
         }
       }
@@ -250,13 +250,13 @@ export class UnderwriterFormComponent implements OnInit {
       return null;
     };
   }
-  
+
   underwriterForm: FormGroup;
   submitted = false;
   error = '';
   successMessage = 'Underwriter registered successfully';
   showSuccessMessage = false;
-  
+
   constructor(
     private formBuilder: FormBuilder,
     public underwriterService: UnderwriterService,
@@ -267,42 +267,43 @@ export class UnderwriterFormComponent implements OnInit {
       name: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-Z\s]+$/)]],
       dob: ['', [Validators.required, this.underAgeValidator()]],
       joiningDate: ['', Validators.required],
-      password: ['', [Validators.required, Validators.pattern(/.*[!@#$%^&*(),.?":{}|<>].*/)]]},
+      password: ['', [Validators.required, Validators.pattern(/.*[!@#$%^&*(),.?":{}|<>].*/)]]
+    },
       { validators: this.joiningDateValidator() });
   }
-  
+
   ngOnInit(): void {
 
   }
-  
-  
+
+
   get f() { return this.underwriterForm.controls; }
-  
+
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
-    
+
     if (this.underwriterForm.invalid) {
       return;
     }
-    
+
     const underwriterData = {
       name: this.f['name'].value,
       dob: this.f['dob'].value,
       joiningDate: this.f['joiningDate'].value,
       password: this.f['password'].value
     };
-    
+
     this.underwriterService.createUnderwriter(underwriterData).subscribe({
       next: (underwriter) => {
         // Register in auth service for demo
         this.authService.addUnderwriter(underwriter.id, underwriterData.password);
-        this.showSuccessMessage=true;
+        this.showSuccessMessage = true;
         setTimeout(() => {
           this.showSuccessMessage = false;
           this.router.navigate(['/admin/underwriters']);
         }, 3000); // Redirect after 3 seconds
-        
+
       },
       error: err => {
         this.error = err.message || 'Failed to register underwriter';

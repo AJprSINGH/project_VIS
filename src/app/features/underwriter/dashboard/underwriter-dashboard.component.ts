@@ -10,7 +10,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
   standalone: true,
   imports: [CommonModule, RouterModule, LoadingSpinnerComponent],
   template: `
-    <div class="container">
+        <div class="container">
       <h1 class="page-title">Underwriter Dashboard</h1>
       
       <div class="dashboard">
@@ -22,10 +22,11 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
         
         <div class="card dashboard-card">
           <h2>Recent Policies</h2>
-          @if (recentPolicies.length === 0 && !insuranceService.isLoading()) {
+          <ng-container *ngIf="recentPolicies.length === 0 && !insuranceService.isLoading()">
             <p class="empty-message">No policies created yet.</p>
             <a routerLink="/underwriter/policies/new" class="btn btn-primary">Create First Policy</a>
-          } @else {
+          </ng-container>
+          <ng-container *ngIf="recentPolicies.length > 0">
             <ul class="recent-list">
               @for (policy of recentPolicies; track policy.id) {
                 <li class="recent-item">
@@ -35,18 +36,18 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                   </div>
                   <span>{{ policy.createdAt | date:'shortDate' }}</span>
                 </li>
-              }
+}
             </ul>
-            @if (recentPolicies.length > 0) {
+            <ng-container *ngIf="recentPolicies.length > 0">
               <a routerLink="/underwriter/policies" class="view-all">View All Policies</a>
-            }
-          }
+            </ng-container>
+          </ng-container>
         </div>
       </div>
       
-      @if (insuranceService.isLoading()) {
+      <ng-container *ngIf="insuranceService.isLoading()">
         <app-loading-spinner message="Loading dashboard data..."></app-loading-spinner>
-      }
+      </ng-container>
     </div>
   `,
   styles: [`
@@ -121,13 +122,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 })
 export class UnderwriterDashboardComponent implements OnInit {
   recentPolicies: VehicleInsurance[] = [];
-  
-  constructor(public insuranceService: InsuranceService) {}
-  
+
+  constructor(public insuranceService: InsuranceService) { }
+
   ngOnInit(): void {
     this.loadDashboardData();
   }
-  
+
   loadDashboardData(): void {
     this.insuranceService.getAllPolicies().subscribe(policies => {
       // Sort by created date descending and take the most recent 5

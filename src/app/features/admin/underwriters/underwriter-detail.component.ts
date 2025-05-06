@@ -18,7 +18,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
         <a routerLink="/admin/underwriters" class="btn btn-outline1">Back to List</a>
       </div>
       
-      @if (underwriter) {
+      <ng-container *ngIf="underwriter">
         <div class="card detail-card">
           <div class="detail-section">
             <h2>Underwriter Information</h2>
@@ -53,46 +53,46 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                   formControlName="newPassword"
                   placeholder="Enter new password"
                   required>
-                @if (f['newPassword'].invalid && (f['newPassword'].touched || submitted)) {
+                <ng-container *ngIf="f['newPassword'].invalid && (f['newPassword'].touched || submitted)">
                   <div class="error-message">
-                    @if (f['newPassword'].errors?.['required']) {
+                    <ng-container *ngIf="f['newPassword'].errors?.['required']">
                       Password is required
-                    } @else if (f['newPassword'].errors?.['pattern']) {
+                    </ng-container><ng-container *ngIf="f['newPassword'].errors?.['pattern']">
                       Password must include at least one special character
-                    }
+                    </ng-container>
                   </div>
-                }
+                </ng-container>
               </div>
               
-              @if (error) {
+              <ng-container *ngIf="error">
                 <div class="error-message">{{ error }}</div>
-              }
+              </ng-container>
               
-              @if (successMessage) {
+              <ng-container *ngIf="successMessage">
                 <div class="success-message">{{ successMessage }}</div>
-              }
+              </ng-container>
               
               <div class="form-actions">
                 <button 
                   type="submit" 
                   class="btn btn-primary" 
                   [disabled]="passwordForm.invalid || underwriterService.isLoading()">
-                  @if (underwriterService.isLoading()) {
+                  <ng-container *ngIf="underwriterService.isLoading()">
                     <span class="spinner-inline"></span>
                     Updating...
-                  } @else {
+                  </ng-container><ng-container *ngIf="true">
                     Update Password
-                  }
+                  </ng-container>
                 </button>
               </div>
             </form>
           </div>
         </div>
-      }
+      </ng-container>
       
-      @if (underwriterService.isLoading() && !underwriter) {
+      <ng-container *ngIf="underwriterService.isLoading() && !underwriter">
         <app-loading-spinner message="Loading underwriter details..."></app-loading-spinner>
-      }
+      </ng-container>
     </div>
   `,
   styles: [`

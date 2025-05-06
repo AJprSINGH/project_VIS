@@ -30,9 +30,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
         </div>
       </div>
       
-      @if (underwriterService.isLoading()) {
+      <ng-container *ngIf="underwriterService.isLoading()">
         <app-loading-spinner message="Loading dashboard data..."></app-loading-spinner>
-      }
+      </ng-container>
     </div>
   `,
   styles: [`
@@ -95,13 +95,13 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
 })
 export class AdminDashboardComponent implements OnInit {
   underwriterCount = 0;
-  
-  constructor(public underwriterService: UnderwriterService) {}
-  
+
+  constructor(public underwriterService: UnderwriterService) { }
+
   ngOnInit(): void {
     this.loadDashboardData();
   }
-  
+
   loadDashboardData(): void {
     this.underwriterService.getAllUnderwriters().subscribe(underwriters => {
       this.underwriterCount = underwriters.length;

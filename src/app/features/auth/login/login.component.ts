@@ -35,9 +35,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
               formControlName="username"
               placeholder="Enter your username"
               autocomplete="username">
-            @if (submitted && f['username'].errors) {
+            <ng-container *ngIf="submitted && f['username'].errors">
               <div class="error-message">Username is required</div>
-            }
+            </ng-container>
           </div>
           
           <div class="form-control">
@@ -48,42 +48,43 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
               formControlName="password"
               placeholder="Enter your password"
               autocomplete="current-password">
-            @if (submitted && f['password'].errors) {
+            <ng-container *ngIf="submitted && f['password'].errors">
               <div class="error-message">Password is required</div>
-            }
+            </ng-container>
           </div>
           
-          @if (error) {
+          <ng-container *ngIf="error">
             <div class="error-message form-error">{{ error }}</div>
-          }
+          </ng-container>
           
           <div class="form-actions">
             <button 
               type="submit" 
               class="btn btn-primary login-btn" 
               [disabled]="authService.isLoading()">
-              @if (authService.isLoading()) {
+              <ng-container *ngIf="authService.isLoading()">
                 <span class="spinner-inline"></span>
                 Logging in...
-              } @else {
+              </ng-container>
+              <ng-container *ngIf="!authService.isLoading()">
                 Log In
-              }
+              </ng-container>
             </button>
           </div>
           
-          @if (loginType === 'admin') {
+          <ng-container *ngIf="loginType === 'admin'">
             <div class="demo-credentials">
               <p>Demo Admin credentials:</p>
               <p><strong>Username:</strong> admin</p>
               <p><strong>Password:</strong> admin</p>
             </div>
-          } @else {
+          </ng-container><ng-container *ngIf="loginType === 'underwriter'">
             <div class="demo-credentials">
               <p>Demo Underwriter credentials:</p>
               <p><strong>Username:</strong> underwriter1</p>
               <p><strong>Password:</strong> Pass&#64;123</p>
             </div>
-          }
+          </ng-container>
         </form>
       </div>
     </div>
@@ -203,7 +204,7 @@ export class LoginComponent {
   error = '';
   loginType: 'admin' | 'underwriter' = 'admin';
   returnUrl: string;
-  
+
   constructor(
     private formBuilder: FormBuilder,
     public authService: AuthService,
@@ -214,34 +215,34 @@ export class LoginComponent {
     if (this.authService.isLoggedIn()) {
       this.redirectBasedOnRole();
     }
-    
+
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required]
     });
-    
+
     // Get return url from route parameters or default to '/'
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
-  
+
   // Convenience getter for easy access to form fields
   get f() { return this.loginForm.controls; }
-  
+
   setLoginType(type: 'admin' | 'underwriter'): void {
     this.loginType = type;
     this.loginForm.reset();
     this.error = '';
   }
-  
+
   onSubmit(): void {
     this.submitted = true;
     this.error = '';
-    
+
     // Stop if form is invalid
     if (this.loginForm.invalid) {
       return;
     }
-    
+
     this.authService.login(
       this.f['username'].value,
       this.f['password'].value
@@ -252,7 +253,7 @@ export class LoginComponent {
       }
     });
   }
-  
+
   private redirectBasedOnRole(): void {
     if (this.authService.isAdmin()) {
       this.router.navigate(['/admin/dashboard']);
