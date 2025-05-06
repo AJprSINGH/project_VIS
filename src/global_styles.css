@@ -100,7 +100,7 @@ a {
 }
 
 a:hover {
-  color: var(--primary-700);
+  color: var(--neutral-100);
   text-decoration: underline;
 }
 
@@ -179,7 +179,7 @@ input, select, button {
 }
 
 .btn-secondary:hover {
-  background-color: var(--secondary-600);
+  background-color: var(--neutral-100);
 }
 
 .btn-accent {
@@ -200,7 +200,15 @@ input, select, button {
 .btn-outline:hover {
   background-color: var(--primary-50);
 }
-
+.btn-outline1 {
+  background-color: transparent;
+  border-color: var(--primary-600);
+  color: var(--primary-600);
+}
+.btn-outline1:hover {
+  background-color: var(--primary-50);
+  color:var(--neutral-700)
+}
 /* Utility classes */
 .text-center {
   text-align: center;

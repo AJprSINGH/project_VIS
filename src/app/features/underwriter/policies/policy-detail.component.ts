@@ -14,7 +14,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     <div class="container">
       <div class="header-actions">
         <h1>Insurance Policy Details</h1>
-        <a routerLink="/underwriter/policies" class="btn btn-outline">Back to List</a>
+        <a routerLink="/underwriter/policies" class="btn btn-outline1">Back to List</a>
       </div>
       
       @if (policy) {

@@ -43,6 +43,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                   <td>{{ underwriter.joiningDate | date:'mediumDate' }}</td>
                   <td class="actions">
                     <a [routerLink]="['/admin/underwriters', underwriter.id]" class="btn-link">View</a>
+                    <a (click)="deleteUnderwriter(underwriter.id)" class="btn-link-1">Delete</a>
                   </td>
                 </tr>
               }
@@ -98,6 +99,19 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     }
     
     .btn-link:hover {
+      cursor:pointer;
+      text-decoration: underline;
+    }
+
+    .btn-link-1 {
+      color: var(--primary-600);
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: var(--space-2);
+    }
+    
+    .btn-link-1:hover {
+      cursor:pointer;
       text-decoration: underline;
     }
     
@@ -142,5 +156,17 @@ export class UnderwriterListComponent implements OnInit {
     this.underwriterService.getAllUnderwriters().subscribe(data => {
       this.underwriters = data;
     });
+  }
+
+  deleteUnderwriter(id: string): void {
+    const confirmDelete = confirm('Are you sure you want to delete this underwriter?');
+    if (confirmDelete) {
+      this.underwriterService.deleteUnderwriter(id).subscribe(() => {
+        this.loadUnderwriters();
+      });
+    } else {
+        return;
+    }
+
   }
 }

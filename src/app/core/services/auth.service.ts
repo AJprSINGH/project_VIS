@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { User } from '../models/user.model';
 
 @Injectable({
@@ -113,15 +113,17 @@ export class AuthService {
   
   // For admin to add new underwriters (demo implementation)
   addUnderwriter(id: string, password: string): void {
-    this.underwriters[id] = { user: `underwriter${id}`, password };
+    this.underwriters[id] = { user: `${id}`, password };
   }
   
   // For admin to update underwriter password (demo implementation)
-  updateUnderwriterPassword(id: string, newPassword: string): boolean {
+  updateUnderwriterPassword(id: string, newPassword: string): Observable<boolean> {
     if (this.underwriters[id]) {
       this.underwriters[id].password = newPassword;
-      return true;
+      return of(true);
+    } else {
+         return of(false)
     }
-    return false;
+   
   }
 }

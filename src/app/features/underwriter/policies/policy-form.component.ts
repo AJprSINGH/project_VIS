@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router'; 
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms'; 
 import { InsuranceService } from '../../../core/services/insurance.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { LoadingSpinnerComponent } from '../../../shared/components/loading-spinner/loading-spinner.component';
@@ -14,7 +14,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     <div class="container">
       <div class="header-actions">
         <h1>Create New Vehicle Insurance</h1>
-        <a routerLink="/underwriter/policies" class="btn btn-outline">Back to List</a>
+        <a routerLink="/underwriter/policies" class="btn btn-outline1">Back to List</a>
       </div>
       
       <div class="card">
@@ -51,7 +51,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
             </div>
             
             <div class="form-control">
-              <label for="customerName">Customer Name (Max 50 characters)</label>
+              <label for="customerName">Customer Name</label>
               <input 
                 type="text" 
                 id="customerName" 
@@ -63,6 +63,8 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                     Customer name is required
                   } @else if (f['customerName'].errors['maxlength']) {
                     Customer name cannot exceed 50 characters
+                  } @else{
+                    Name should only contain letters 
                   }
                 </div>
               }
@@ -103,8 +105,8 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 <div class="error-message">
                   @if (f['phoneNo'].errors['required']) {
                     Phone number is required
-                  } @else if (f['phoneNo'].errors['pattern']) {
-                    Phone number must be 10 digits
+                  } @else {
+                    Phone number must be 10 digits and do not start wit zero!!
                   }
                 </div>
               }
@@ -116,7 +118,7 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
                 type="number" 
                 id="premiumAmount" 
                 formControlName="premiumAmount"
-                placeholder="Enter premium amount">
+                placeholder="N/A">
               @if (submitted && f['premiumAmount'].errors) {
                 <div class="error-message">
                   @if (f['premiumAmount'].errors['required']) {
@@ -162,7 +164,6 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
               }
             </div>
           </div>
-          
           @if (error) {
             <div class="error-message">{{ error }}</div>
           }
@@ -238,7 +239,9 @@ import { LoadingSpinnerComponent } from '../../../shared/components/loading-spin
     }
   `]
 })
-export class PolicyFormComponent {
+export class PolicyFormComponent implements OnInit{
+  
+  
   policyForm: FormGroup;
   submitted = false;
   error = '';
@@ -252,15 +255,48 @@ export class PolicyFormComponent {
     this.policyForm = this.formBuilder.group({
       vehicleNo: ['', [Validators.required, Validators.maxLength(10)]],
       vehicleType: ['', Validators.required],
-      customerName: ['', [Validators.required, Validators.maxLength(50)]],
+      customerName: ['', [Validators.required, Validators.maxLength(50), Validators.pattern(/^[a-zA-Z\s]+$/)]],
       engineNo: ['', Validators.required],
       chassisNo: ['', Validators.required],
-      phoneNo: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      premiumAmount: ['', [Validators.required, Validators.min(1)]],
+      phoneNo: ['', [Validators.required, Validators.pattern(/^[1-9]\d{9}$/)]],
+      premiumAmount: [null, [Validators.required, Validators.min(1)]],
       type: ['', Validators.required],
       fromDate: ['', Validators.required],
       toDate: ['', Validators.required]
     });
+  }
+  
+  
+  private calculateToDate(fromDate: string | null): string | null {
+    if (!fromDate) {
+      return null;
+    }
+    const from = new Date(fromDate);
+    const to = new Date(from);
+    to.setFullYear(from.getFullYear() + 1);
+    const year = to.getFullYear();
+    const month = (to.getMonth() + 1).toString().padStart(2, '0');
+    const day = to.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+  
+  ngOnInit(): void {
+    this.policyForm.get('type')?.valueChanges.subscribe(type => {
+      if (type === 'Full Insurance') {
+        this.policyForm.get('premiumAmount')?.setValue(3000);
+      } else if (type === 'Third Party') {
+        this.policyForm.get('premiumAmount')?.setValue(5000);
+      } else {
+        this.policyForm.get('premiumAmount')?.setValue(null);
+      }
+    });
+
+    this.policyForm.get('fromDate')?.valueChanges.subscribe(fromDate => {
+      const toDate = this.calculateToDate(fromDate);
+      this.policyForm.get('toDate')?.setValue(toDate, { emitEvent: false });
+    });
+    
+    
   }
   
   get f() { return this.policyForm.controls; }

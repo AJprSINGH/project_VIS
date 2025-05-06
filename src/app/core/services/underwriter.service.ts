@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { Underwriter } from '../models/user.model';
 
@@ -101,6 +101,26 @@ export class UnderwriterService {
         this.isLoading.set(false);
         return of({ ...updatedUnderwriter });
       }
+    );
+  }
+
+  deleteUnderwriter(id: string): Observable<any> {
+    this.isLoading.set(true);
+    const index = this.underwriters.findIndex(u => u.id === id);
+
+    if (index === -1) {
+      this.isLoading.set(false);
+      return throwError(() => new Error('Underwriter not found'));
+    }
+
+    this.underwriters.splice(index, 1);
+    
+    // Simulate API call
+    return of(null).pipe(delay(800),
+    () => {
+      this.isLoading.set(false);
+      return of(null)
+    }
     );
   }
 }
